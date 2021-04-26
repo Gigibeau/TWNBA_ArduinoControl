@@ -185,6 +185,7 @@ void MoveXY(int x, int y){
 
 // Move in x direction
 void MoveX(int x, int y){
+  x = x * 0.6;
   speed1 = y; 
   if (x >= 0) {
     myMotor2->step(x, BACKWARD, DOUBLE);
@@ -199,6 +200,7 @@ void MoveX(int x, int y){
 
 // Move in y direction
 void MoveY(int x, int y){
+  x = x * 0.6;
   speed2 = y; 
   if (x >= 0) {
     myMotor1->step(x, BACKWARD, DOUBLE);

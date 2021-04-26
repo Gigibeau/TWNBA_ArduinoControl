@@ -11,7 +11,7 @@ import threading
 
 # Establish connection to the Arduino
 global arduino
-port = '/dev/cu.usbmodem142301'
+port = '/dev/cu.usbmodem143401'
 baudrate = 9600
 timeout = 0.1
 # arduino = serial.Serial(port=port, baudrate=baudrate, timeout=timeout)
@@ -103,7 +103,7 @@ mmlabelframe = LabelFrame(root, text='Manual Mode', width=450, height=50)
 mmlabelframe.grid(row=0, column=0, columnspan=4, rowspan=3)
 
 # Placement of the buttons
-entry_speed = Entry(mmlabelframe, state=DISABLED, width=5)
+entry_speed = Entry(mmlabelframe, width=5)
 entry_speed.insert(5, '[1-5]')
 entry_speed.grid(row=0, column=1, padx=2, pady=2)
 entry_speed.bind("<Button-1>", some_callback)
