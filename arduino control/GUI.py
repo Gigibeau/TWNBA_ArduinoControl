@@ -5,14 +5,16 @@ import time
 from tkinter import ttk
 from tkinter import filedialog
 import pickle
+import threading
 
 ''' ==== Arduino communication ==== '''
 
 # Establish connection to the Arduino
-port = '/dev/cu.usbmodem142401'
+global arduino
+port = '/dev/cu.usbmodem142301'
 baudrate = 9600
 timeout = 0.1
-arduino = serial.Serial(port=port, baudrate=baudrate, timeout=timeout)
+# arduino = serial.Serial(port=port, baudrate=baudrate, timeout=timeout)
 
 # Function that communicates with the Arduino
 startMarker = "<"
@@ -101,12 +103,12 @@ mmlabelframe = LabelFrame(root, text='Manual Mode', width=450, height=50)
 mmlabelframe.grid(row=0, column=0, columnspan=4, rowspan=3)
 
 # Placement of the buttons
-entry_speed = Entry(mmlabelframe, width=5)
+entry_speed = Entry(mmlabelframe, state=DISABLED, width=5)
 entry_speed.insert(5, '[1-5]')
 entry_speed.grid(row=0, column=1, padx=2, pady=2)
 entry_speed.bind("<Button-1>", some_callback)
 
-button_setspeed = Button(mmlabelframe, text='Set Speed',
+button_setspeed = Button(mmlabelframe, text='Set Speed', state=DISABLED,
                          command=lambda: write_read_gui("<1, " + entry_speed.get() + ", " + entry_speed.get() + ">"))
 button_setspeed.grid(row=0, column=2, padx=0, pady=0)
 
@@ -122,7 +124,8 @@ button_left.grid(row=2, column=1, padx=0, pady=0)
 button_right = Button(mmlabelframe, text="\u2192", state=DISABLED, height=3, width=3)
 button_right.grid(row=2, column=3, padx=0, pady=0)
 
-button_enter = Button(mmlabelframe, text='Enter', command=lambda: [write_read_gui("<8, 0, 0>"), enter_mm()])
+button_enter = Button(mmlabelframe, text='Enter', state=DISABLED,
+                      command=lambda: [write_read_gui("<8, 0, 0>"), enter_mm()])
 button_enter.grid(row=4, column=1, padx=0, pady=0)
 
 button_exit = Button(mmlabelframe, text='Exit', state=DISABLED, command=lambda: [write_read_gui("e"), exit_mm()])
@@ -144,13 +147,13 @@ button_right.bind("<ButtonRelease>", lambda x: on_release())
 text = Text(root, width=80, height=10)
 vsb = Scrollbar(root, command=text.yview)
 text.configure(yscrollcommand=vsb.set)
-vsb.grid(row=11, column=10)
-text.grid(row=11, column=0, columnspan=10)
+vsb.grid(row=12, column=10)
+text.grid(row=12, column=0, columnspan=10)
 
 ''' ==== Recipe User Interface ==== '''
 
 # Placement of the buttons
-button_setorigin = Button(root, text='Set Origin', command=lambda: write_read_gui("<5, 0, 0>"))
+button_setorigin = Button(root, text='Set Origin', state=DISABLED, command=lambda: write_read_gui("<5, 0, 0>"))
 button_setorigin.grid(row=3, column=4, columnspan=2, padx=10, pady=5)
 
 # Display for the current position
@@ -193,7 +196,8 @@ class Command:
         self.input_speed.grid(row=row, column=column + 2, padx=2, pady=2)
         self.input_speed.bind("<Button-1>", some_callback)
 
-        self.button_exec = Button(root, text='Execute', command=lambda: self.exec_line(self.Combo.get()))
+        self.button_exec = Button(root, text='Execute', state=DISABLED,
+                                  command=lambda: self.exec_line(self.Combo.get()))
         self.button_exec.grid(row=row, column=column + 3, padx=2, pady=2)
 
     def exec_line(self, function):
@@ -226,15 +230,21 @@ class Command:
             log("slept for " + str(duration) + " seconds")
 
 
-line_1 = Command(4, 3)
-line_2 = Command(5, 3)
-line_3 = Command(6, 3)
-line_4 = Command(7, 3)
-line_5 = Command(8, 3)
-line_6 = Command(9, 3)
+label_distance = Label(root, text='Distance/Minutes')
+label_distance.grid(row=4, column=4)
+label_speed = Label(root, text='Speed/Seconds')
+label_speed.grid(row=4, column=5)
 
-lines_to_exec = [line_1, line_2, line_3, line_4, line_5]
-button_exec_all = Button(root, text="Execute All", command=lambda: exec_all())
+line_1 = Command(5, 3)
+line_2 = Command(6, 3)
+line_3 = Command(7, 3)
+line_4 = Command(8, 3)
+line_5 = Command(9, 3)
+line_6 = Command(10, 3)
+
+lines_to_exec = [line_1, line_2, line_3, line_4, line_5, line_6]
+button_exec_all = Button(root, text="Execute All", state=DISABLED,
+                         command=lambda: threading.Thread(target=exec_all).start())
 button_exec_all.grid(row=3, column=6, columnspan=2)
 
 
@@ -246,18 +256,18 @@ def exec_all():
 ''' ==== Saving and Loading entries ==== '''
 
 # Adding the save and load buttons
-button_save = Button(root, text="\U0001f4be", command=lambda: save_files())
-button_save.grid(row=10, column=5)
+button_save = Button(root, text="\U0001f4be", state=DISABLED, command=lambda: save_files())
+button_save.grid(row=11, column=5)
 
-button_open = Button(root, text="\U0001F4C2", command=lambda: open_files())
-button_open.grid(row=10, column=6)
+button_open = Button(root, text="\U0001F4C2", state=DISABLED, command=lambda: open_files())
+button_open.grid(row=11, column=6)
 
 
 # Saving the current entries and combos
 
 def save_files():
     file_name = filedialog.asksaveasfilename(
-        initialdir="/Users/beau/Desktop", title="Save File",
+        title="Save File",
         filetypes=(("Dat Files", "*.dat"), ("All Files", "*.*"))
     )
     if file_name:
@@ -285,7 +295,7 @@ def save_files():
 
 def open_files():
     file_name = filedialog.askopenfilename(
-        initialdir="/Users/beau/Desktop", title="Open File",
+        title="Open File",
         filetypes=(("Dat Files", "*.dat"), ("All Files", "*.*"))
     )
     input_file = open(file_name, 'rb')
@@ -307,7 +317,7 @@ def open_files():
 
 ''' ==== Enabling and disabling buttons to prevent crashes ==== '''
 
-buttons_state1 = [button_setorigin, button_setspeed, button_open, button_save, button_exec_all]
+buttons_state1 = [button_setorigin, button_setspeed, button_open, button_save, button_exec_all, button_enter]
 for line in lines_to_exec:
     buttons_state1.append(line.button_exec)
 
@@ -329,8 +339,30 @@ def exit_mm():
 
 
 ''' ==== Bluetooth Button ==== '''
+
+
 # TODO: make functional bluetooth button
-button_bluetooth = Button(root, text="B")
-button_bluetooth.grid(row=0, column=6)
+
+def bluetooth():
+    button_start.config(state='normal')
+
+
+def start():
+    global arduino
+    arduino = serial.Serial(port=port, baudrate=baudrate, timeout=timeout)
+    while True:
+        arduino_reply = recv_from_arduino()
+        if not (arduino_reply == 'XXX'):
+            log(arduino_reply)
+            for button in buttons_state1:
+                button.config(state="normal")
+            break
+
+
+button_bluetooth = Button(root, text="B", command=lambda: bluetooth())
+button_bluetooth.grid(row=0, column=7)
+
+button_start = Button(root, text="S", state=DISABLED, command=lambda: start())
+button_start.grid(row=0, column=6)
 
 root.mainloop()
