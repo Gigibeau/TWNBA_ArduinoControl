@@ -359,10 +359,10 @@ def start():
             break
 
 
-button_bluetooth = Button(root, text="B", command=lambda: bluetooth())
+button_bluetooth = Button(root, text="Bluetooth", command=lambda: bluetooth())
 button_bluetooth.grid(row=0, column=7)
 
-button_start = Button(root, text="S", state=DISABLED, command=lambda: start())
+button_start = Button(root, text="Start", state=DISABLED, command=lambda: start())
 button_start.grid(row=0, column=6)
 
 root.mainloop()
