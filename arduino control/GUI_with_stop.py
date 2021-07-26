@@ -11,7 +11,7 @@ import threading
 
 # Establish connection to the Arduino
 global arduino
-port = '/dev/cu.usbmodem142401'
+port = '/dev/cu.usbmodem143401'
 baudrate = 9600
 timeout = 0.1
 # arduino = serial.Serial(port=port, baudrate=baudrate, timeout=timeout)
@@ -202,16 +202,20 @@ class Command:
 
     def exec_line(self, function):
         if function == "Up":
-            write_read_gui("<4, " + self.input_distance.get() + ", " + self.input_speed.get() + ">")
+            for _ in range(int(self.input_distance.get())):
+                write_read_gui("<4, " + "1" + ", " + self.input_speed.get() + ">")
 
         if function == "Down":
-            write_read_gui("<4, -" + self.input_distance.get() + ", " + self.input_speed.get() + ">")
+            for _ in range(int(self.input_distance.get())):
+                write_read_gui("<4, -" + "1" + ", " + self.input_speed.get() + ">")
 
         if function == "Left":
-            write_read_gui("<3, -" + self.input_distance.get() + ", " + self.input_speed.get() + ">")
+            for _ in range(int(self.input_distance.get())):
+                write_read_gui("<3, -" + "1" + ", " + self.input_speed.get() + ">")
 
         if function == "Right":
-            write_read_gui("<3, " + self.input_distance.get() + ", " + self.input_speed.get() + ">")
+            for _ in range(int(self.input_distance.get())):
+                write_read_gui("<3, " + "1" + ", " + self.input_speed.get() + ">")
 
         if function == "Sleep":
             duration = 0
