@@ -186,13 +186,20 @@ void MoveXY(int x, int y){
 // Move in x direction
 void MoveX(int x, int y){
   x = x * 1.7;
+  int distance_x = fabs(x);
   speed1 = y;
   myMotor2->setSpeed(y);
   if (x >= 0) {
-    myMotor2->step(x, BACKWARD, DOUBLE);
+    while (distance_x > 0) {
+        myMotor2->step(1, BACKWARD, DOUBLE);
+        distance_x = distance_x - 1;
+        }
   }
   else {
-    myMotor2->step(abs(x), FORWARD, DOUBLE);
+    while (distance_x > 0) {
+        myMotor2->step(1, FORWARD, DOUBLE);
+        distance_x = distance_x - 1;
+        }
   }
   xposition = xposition + x;
   Serial.print(String("<") + xposition + String(";") + yposition + String(";Moved to x: ") + xposition + String(" y: ") + yposition);
@@ -202,13 +209,20 @@ void MoveX(int x, int y){
 // Move in y direction
 void MoveY(int x, int y){
   x = x * 1.7;
+  int distance_y = fabs(x);
   speed2 = y;
   myMotor1->setSpeed(y);
   if (x >= 0) {
-    myMotor1->step(x, BACKWARD, DOUBLE);
+    while (distance_y > 0) {
+        myMotor1->step(1, BACKWARD, DOUBLE);
+        distance_y = distance_y - 1;
+        }
   }
   else {
-    myMotor1->step(abs(x), FORWARD, DOUBLE);
+    while (distance_y > 0) {
+        myMotor1->step(1, FORWARD, DOUBLE);
+        distance_y = distance_y - 1;
+        }
   }
   yposition = yposition + x;
   Serial.print(String("<") + xposition + String(";") + yposition + String(";Moved to x: ") + xposition + String(" y: ") + yposition);
