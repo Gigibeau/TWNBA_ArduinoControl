@@ -100,36 +100,36 @@ def some_callback(event):  # to delete the preset text once clicked
 ''' ==== Manual Mode ==== '''
 
 mmlabelframe = LabelFrame(root, text='Manual Mode', width=450, height=50)
-mmlabelframe.grid(row=0, column=0, columnspan=4, rowspan=3)
+mmlabelframe.grid(row=1, column=0, columnspan=4, rowspan=3)
 
 # Placement of the buttons
 entry_speed = Entry(mmlabelframe, width=5)
-entry_speed.insert(5, '[1-5]')
-entry_speed.grid(row=0, column=1, padx=2, pady=2)
+entry_speed.insert(5, 'mm/sec')
+entry_speed.grid(row=1, column=1, padx=2, pady=2)
 entry_speed.bind("<Button-1>", some_callback)
 
 button_setspeed = Button(mmlabelframe, text='Set Speed', state=DISABLED,
                          command=lambda: write_read_gui("<1, " + entry_speed.get() + ", " + entry_speed.get() + ">"))
-button_setspeed.grid(row=0, column=2, padx=0, pady=0)
+button_setspeed.grid(row=1, column=2, padx=0, pady=0)
 
 button_up = Button(mmlabelframe, text="\u2191", state=DISABLED, height=3, width=3)
-button_up.grid(row=1, column=2, padx=0, pady=0)
+button_up.grid(row=2, column=2, padx=0, pady=0)
 
 button_down = Button(mmlabelframe, text="\u2193", state=DISABLED, height=3, width=3)
-button_down.grid(row=3, column=2, padx=0, pady=0)
+button_down.grid(row=4, column=2, padx=0, pady=0)
 
 button_left = Button(mmlabelframe, text="\u2190", state=DISABLED, height=3, width=3)
-button_left.grid(row=2, column=1, padx=0, pady=0)
+button_left.grid(row=3, column=1, padx=0, pady=0)
 
 button_right = Button(mmlabelframe, text="\u2192", state=DISABLED, height=3, width=3)
-button_right.grid(row=2, column=3, padx=0, pady=0)
+button_right.grid(row=3, column=3, padx=0, pady=0)
 
 button_enter = Button(mmlabelframe, text='Enter', state=DISABLED,
                       command=lambda: [write_read_gui("<8, 0, 0>"), enter_mm()])
-button_enter.grid(row=4, column=1, padx=0, pady=0)
+button_enter.grid(row=5, column=1, padx=0, pady=0)
 
 button_exit = Button(mmlabelframe, text='Exit', state=DISABLED, command=lambda: [write_read_gui("e"), exit_mm()])
-button_exit.grid(row=4, column=3, padx=0, pady=0)
+button_exit.grid(row=5, column=3, padx=0, pady=0)
 
 # Defining the outcome of a press/release
 button_up.bind("<ButtonPress>", lambda x: on_press("w"))
@@ -173,9 +173,9 @@ xtext.grid(row=1, column=4)
 ytext = Label(root, text="y-position")
 ytext.grid(row=1, column=5)
 
-xlabel = Label(root, textvariable=xposition, bg="white", font=("Bold", 10))
+xlabel = Label(root, textvariable=xposition, bg="white", font=("Bold", 30))
 xlabel.grid(row=2, column=4)
-ylabel = Label(root, textvariable=yposition, bg="white", font=("Bold", 10))
+ylabel = Label(root, textvariable=yposition, bg="white", font=("Bold", 30))
 ylabel.grid(row=2, column=5)
 
 
@@ -195,12 +195,13 @@ class Command:
         self.input_distance.bind("<Button-1>", some_callback)
 
         self.input_speed = Entry(root, width=15)
-        self.input_speed.insert(0, '[1-5] or [sec]')
+        self.input_speed.insert(0, '[mm/sec] or [sec]')
         self.input_speed.grid(row=row, column=column + 2, padx=2, pady=2)
         self.input_speed.bind("<Button-1>", some_callback)
 
         self.button_exec = Button(root, text='Execute', state=DISABLED,
-                                  command=lambda: threading.Thread(target=self.exec_line(self.Combo.get())).start())
+                                  command=lambda: threading.Thread(target=self.exec_line,
+                                                                   args=self.Combo.get()).start())
         self.button_exec.grid(row=row, column=column + 3, padx=2, pady=2)
 
     def exec_line(self, function):
@@ -247,7 +248,7 @@ line_6 = Command(10, 3)
 lines_to_exec = [line_1, line_2, line_3, line_4, line_5, line_6]
 button_exec_all = Button(root, text="Execute All", state=DISABLED,
                          command=lambda: threading.Thread(target=exec_all).start())
-button_exec_all.grid(row=3, column=6, columnspan=2)
+button_exec_all.grid(row=4, column=6, columnspan=1)
 
 
 def exec_all():
@@ -371,9 +372,9 @@ def start():
 
 
 button_bluetooth = Button(root, text="Bluetooth", command=lambda: bluetooth())
-button_bluetooth.grid(row=0, column=7)
+button_bluetooth.grid(row=0, column=6)
 
 button_start = Button(root, text="Start", state=DISABLED, command=lambda: start())
-button_start.grid(row=0, column=6)
+button_start.grid(row=1, column=6)
 
 root.mainloop()
