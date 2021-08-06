@@ -197,7 +197,7 @@ class Command:
         self.input_speed.bind("<Button-1>", some_callback)
 
         self.button_exec = Button(root, text='Execute', state=DISABLED,
-                                  command=lambda: self.exec_line(self.Combo.get()))
+                                  command=lambda: threading.Thread(target=self.exec_line(self.Combo.get())).start())
         self.button_exec.grid(row=row, column=column + 3, padx=2, pady=2)
 
     def exec_line(self, function):
@@ -250,6 +250,14 @@ button_exec_all.grid(row=3, column=6, columnspan=2)
 def exec_all():
     for entry_line in lines_to_exec:
         entry_line.exec_line(entry_line.Combo.get())
+
+
+button_stop = Button(root, text='Stop', state=DISABLED, bg='red', command=lambda: stop())
+button_stop.grid(row=11, column=4)
+
+
+def stop():
+    send_to_arduino('9')
 
 
 ''' ==== Saving and Loading entries ==== '''
@@ -316,7 +324,8 @@ def open_files():
 
 ''' ==== Enabling and disabling buttons to prevent crashes ==== '''
 
-buttons_state1 = [button_setorigin, button_setspeed, button_open, button_save, button_exec_all, button_enter]
+buttons_state1 = [button_setorigin, button_setspeed, button_open, button_save, button_stop, button_exec_all,
+                  button_enter]
 for line in lines_to_exec:
     buttons_state1.append(line.button_exec)
 
