@@ -147,8 +147,8 @@ button_right.bind("<ButtonRelease>", lambda x: on_release())
 text = Text(root, width=80, height=10)
 vsb = Scrollbar(root, command=text.yview)
 text.configure(yscrollcommand=vsb.set)
-vsb.grid(row=12, column=10)
-text.grid(row=12, column=0, columnspan=10)
+vsb.grid(row=13, column=10)
+text.grid(row=13, column=0, columnspan=10)
 
 ''' ==== Recipe User Interface ==== '''
 
@@ -201,8 +201,25 @@ class Command:
 
         self.button_exec = Button(root, text='Execute', state=DISABLED,
                                   command=lambda: threading.Thread(target=self.exec_line,
-                                                                   args=self.Combo.get()).start())
+                                                                   args=[self.Combo.get()]).start())
         self.button_exec.grid(row=row, column=column + 3, padx=2, pady=2)
+
+    def sleep(self):
+        duration = 0
+        try:
+            duration = int(self.input_speed.get())
+        except ValueError:
+            pass
+
+        try:
+            duration = duration + (int(self.input_distance.get()) * 60)
+        except ValueError:
+            pass
+
+        for time_counter in range(duration):
+            time.sleep(1)
+            log("sleeping for " + str(time_counter + 1) + " seconds")
+            time_counter += 1
 
     def exec_line(self, function):
         if function == "Up":
@@ -218,6 +235,7 @@ class Command:
             write_read_gui("<3, " + self.input_distance.get() + ", " + self.input_speed.get() + ">")
 
         if function == "Sleep":
+            threading.Thread(target=self.sleep).start()
             duration = 0
             try:
                 duration = int(self.input_speed.get())
@@ -228,9 +246,7 @@ class Command:
                 duration = duration + (int(self.input_distance.get()) * 60)
             except ValueError:
                 pass
-
             time.sleep(duration)
-            log("slept for " + str(duration) + " seconds")
 
 
 label_distance = Label(root, text='Distance or Duration')
@@ -250,14 +266,22 @@ button_exec_all = Button(root, text="Execute All", state=DISABLED,
                          command=lambda: threading.Thread(target=exec_all).start())
 button_exec_all.grid(row=4, column=6, columnspan=1)
 
+label_repetitions = Label(root, text="Repetitions:")
+label_repetitions.grid(row=11, column=5)
+
+entry_repetitions = Entry(root, width=1)
+entry_repetitions.insert(0, "1")
+entry_repetitions.grid(row=11, column=6)
+
 
 def exec_all():
-    for entry_line in lines_to_exec:
-        entry_line.exec_line(entry_line.Combo.get())
+    for _ in range(int(entry_repetitions.get())):
+        for entry_line in lines_to_exec:
+            entry_line.exec_line(entry_line.Combo.get())
 
 
-button_stop = Button(root, text='Stop', state=DISABLED, bg='red', command=lambda: stop())
-button_stop.grid(row=11, column=4)
+button_stop = Button(root, text='Stop', state=DISABLED, bg='red', width=5, height=2, command=lambda: stop())
+button_stop.grid(row=11, column=4, rowspan=2)
 
 
 def stop():
@@ -268,10 +292,10 @@ def stop():
 
 # Adding the save and load buttons
 button_save = Button(root, text="\U0001f4be", state=DISABLED, command=lambda: save_files())
-button_save.grid(row=11, column=5)
+button_save.grid(row=12, column=5)
 
 button_open = Button(root, text="\U0001F4C2", state=DISABLED, command=lambda: open_files())
-button_open.grid(row=11, column=6)
+button_open.grid(row=12, column=6)
 
 
 # Saving the current entries and combos

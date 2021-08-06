@@ -157,7 +157,7 @@ void executeFunction() {
 //====== Motor Functions ======
 
 // Change the speed of the motors
-void SetSpeed(int x, int y){
+void SetSpeed(float x, float y){
   speed1 = x;
   speed2 = y;
   x = x * 5;
@@ -190,7 +190,7 @@ void MoveXY(int x, int y){
 }
 
 // Move in x direction
-void MoveX(int x, int y){
+void MoveX(float x, float y){
   int move_count_x = 0;
   break_var = 0;
   speed1 = y;
@@ -226,7 +226,7 @@ void MoveX(int x, int y){
 }
 
 // Move in y direction
-void MoveY(int x, int y){
+void MoveY(float x, float y){
   int move_count_y = 0;
   break_var = 0;
   speed2 = y;
