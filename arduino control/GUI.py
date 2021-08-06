@@ -11,7 +11,7 @@ import threading
 
 # Establish connection to the Arduino
 global arduino
-port = '/dev/cu.usbmodem142401'
+port = '/dev/cu.usbmodem143401'
 baudrate = 9600
 timeout = 0.1
 # arduino = serial.Serial(port=port, baudrate=baudrate, timeout=timeout)
@@ -154,7 +154,10 @@ text.grid(row=12, column=0, columnspan=10)
 
 # Placement of the buttons
 button_setorigin = Button(root, text='Set Origin', state=DISABLED, command=lambda: write_read_gui("<5, 0, 0>"))
-button_setorigin.grid(row=3, column=4, columnspan=2, padx=10, pady=5)
+button_setorigin.grid(row=3, column=4, columnspan=1, padx=10, pady=5)
+
+button_toorigin = Button(root, text='Go to Origin', state=DISABLED, command=lambda: write_read_gui("<9, 0, 0>"))
+button_toorigin.grid(row=3, column=5, columnspan=1, padx=10, pady=5)
 
 # Display for the current position
 xposition = StringVar()
@@ -229,9 +232,9 @@ class Command:
             log("slept for " + str(duration) + " seconds")
 
 
-label_distance = Label(root, text='Distance/Minutes')
+label_distance = Label(root, text='Distance or Duration')
 label_distance.grid(row=4, column=4)
-label_speed = Label(root, text='Speed/Seconds')
+label_speed = Label(root, text='Speed or Duration')
 label_speed.grid(row=4, column=5)
 
 line_1 = Command(5, 3)
@@ -257,7 +260,7 @@ button_stop.grid(row=11, column=4)
 
 
 def stop():
-    send_to_arduino('9')
+    send_to_arduino("Stop")
 
 
 ''' ==== Saving and Loading entries ==== '''
@@ -324,8 +327,8 @@ def open_files():
 
 ''' ==== Enabling and disabling buttons to prevent crashes ==== '''
 
-buttons_state1 = [button_setorigin, button_setspeed, button_open, button_save, button_stop, button_exec_all,
-                  button_enter]
+buttons_state1 = [button_setorigin, button_toorigin, button_setspeed, button_open, button_save, button_stop,
+                  button_exec_all, button_enter]
 for line in lines_to_exec:
     buttons_state1.append(line.button_exec)
 

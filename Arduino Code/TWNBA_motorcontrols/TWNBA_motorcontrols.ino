@@ -1,3 +1,5 @@
+#include <Adafruit_MotorShield.h>
+
 // Import Libraries
 #include <Adafruit_MotorShield.h>
 #include <Wire.h>

@@ -12,6 +12,7 @@ int speed1;   // the current speed for motor 1
 int speed2;   // the current speed for motor 2
 int xposition;    // the current x position in steps
 int yposition;    // the current y position in steps
+int break_var;
 
 //============
 
@@ -51,7 +52,7 @@ void setup() {
     // Startup movement (so the coils are hot)
     myMotor1->step(1, BACKWARD, DOUBLE);
     myMotor2->step(1, BACKWARD, DOUBLE);
-    
+
     Serial.println("<Arduino is ready!>");
 }
 
@@ -112,7 +113,7 @@ void parseData() {      // split the data into its parts
 
     strtokIndx = strtok(tempChars,",");      // get the first part
     firstint = atoi(strtokIndx);     // convert this part to an integer
- 
+
     strtokIndx = strtok(NULL, ","); // this continues where the previous call left off
     secondint = atoi(strtokIndx);     // convert this part to an integer
 
@@ -136,7 +137,7 @@ void executeFunction() {
   if (firstint == 4){
     MoveY(secondint, thirdint);   // <4, distance in y-direction, speed in y-direction>
   }
-  if (firstint == 5){     
+  if (firstint == 5){
     setOrigin();                  // <5, inconsequential, inconsequential>
   }
   if (firstint == 6){
@@ -148,6 +149,9 @@ void executeFunction() {
   if (firstint == 8){
     ManualMode();                // <8, inconsequential, inconsequential>
   }
+  if (firstint == 9){
+    MoveToOrigin();                // <8, inconsequential, inconsequential>
+  }
 }
 
 //====== Motor Functions ======
@@ -156,6 +160,8 @@ void executeFunction() {
 void SetSpeed(int x, int y){
   speed1 = x;
   speed2 = y;
+  x = x * 5;
+  y = y * 5;
   myMotor1->setSpeed(speed1);
   myMotor2->setSpeed(speed2);
   Serial.println(String("<") + xposition + String(";") + yposition + String(";y-speed: ") + speed1 + String(" x-speed: ") + speed2 + String(">"));
@@ -185,46 +191,72 @@ void MoveXY(int x, int y){
 
 // Move in x direction
 void MoveX(int x, int y){
-  x = x * 1.7;
-  int distance_x = fabs(x);
+  int move_count_x = 0;
+  break_var = 0;
   speed1 = y;
+  x = x * 17;
+  y = y * 5;
+  int distance_x = fabs(x);
   myMotor2->setSpeed(y);
   if (x >= 0) {
-    while (distance_x > 0) {
+    while (distance_x > 0 && break_var == 0) {
         myMotor2->step(1, BACKWARD, DOUBLE);
+        move_count_x = move_count_x + 1;
         distance_x = distance_x - 1;
+        if (Serial.available()) {
+            break_var = 1;
+            Serial.print(String("Stop pressed!"));
+            }
         }
   }
   else {
-    while (distance_x > 0) {
+    while (distance_x > 0 && break_var == 0) {
         myMotor2->step(1, FORWARD, DOUBLE);
+        move_count_x = move_count_x - 1;
         distance_x = distance_x - 1;
+        if (Serial.available()) {
+            break_var = 1;
+            Serial.print(String("Stop pressed!"));
+            }
         }
   }
-  xposition = xposition + x;
+  xposition = xposition + (move_count_x / 17);
   Serial.print(String("<") + xposition + String(";") + yposition + String(";Moved to x: ") + xposition + String(" y: ") + yposition);
   Serial.println(String(" Current speed y: ") + speed1 + String(" x: ") + speed2 + String(">"));
 }
 
 // Move in y direction
 void MoveY(int x, int y){
-  x = x * 1.7;
-  int distance_y = fabs(x);
+  int move_count_y = 0;
+  break_var = 0;
   speed2 = y;
+  x = x * 17;
+  y = y * 5;
+  int distance_y = fabs(x);
   myMotor1->setSpeed(y);
   if (x >= 0) {
-    while (distance_y > 0) {
+    while (distance_y > 0 && break_var == 0) {
         myMotor1->step(1, BACKWARD, DOUBLE);
+        move_count_y = move_count_y + 1;
         distance_y = distance_y - 1;
+        if (Serial.available()) {
+            break_var = 1;
+            Serial.print(String("Stop pressed!"));
+            }
         }
   }
   else {
-    while (distance_y > 0) {
+    while (distance_y > 0 && break_var == 0) {
         myMotor1->step(1, FORWARD, DOUBLE);
+        move_count_y = move_count_y - 1;
         distance_y = distance_y - 1;
+        if (Serial.available()) {
+            break_var = 1;
+            Serial.print(String("Stop pressed!"));
+            }
         }
   }
-  yposition = yposition + x;
+  yposition = yposition + (move_count_y / 17);
   Serial.print(String("<") + xposition + String(";") + yposition + String(";Moved to x: ") + xposition + String(" y: ") + yposition);
   Serial.println(String(" Current speed y: ") + speed1 + String(" x: ") + speed2 + String(">"));
 }
@@ -233,7 +265,7 @@ void MoveY(int x, int y){
 void setOrigin(){
   xposition = 0;
   yposition = 0;
-  Serial.println(String("<") + xposition + String(";") + yposition + String(";Current position set as new origin.>"));    
+  Serial.println(String("<") + xposition + String(";") + yposition + String(";Current position set as new origin.>"));
 }
 
 // Return current position
@@ -244,6 +276,61 @@ void returnPosition(){
 // Return current speed
 void returnSpeed(){
   Serial.println(String("<y-speed: ") + speed1 + String(" x-speed: ") + speed2 + String(">"));
+}
+
+// Move back to origin
+void MoveToOrigin(){
+  int x;
+  break_var = 0;
+  x = - (xposition * 17);
+  int distance_x = fabs(x);
+  if (x >= 0) {
+    while (distance_x > 0 && break_var == 0) {
+        myMotor2->step(1, BACKWARD, DOUBLE);
+        distance_x = distance_x - 1;
+        if (Serial.available()) {
+            break_var = 1;
+            Serial.print(String("Stop pressed!"));
+            }
+        }
+  }
+  else {
+    while (distance_x > 0 && break_var == 0) {
+        myMotor2->step(1, FORWARD, DOUBLE);
+        distance_x = distance_x - 1;
+        if (Serial.available()) {
+            break_var = 1;
+            Serial.print(String("Stop pressed!"));
+            }
+        }
+  }
+
+  x = - (yposition * 17);
+  int distance_y = fabs(x);
+  if (x >= 0) {
+    while (distance_y > 0 && break_var == 0) {
+        myMotor1->step(1, BACKWARD, DOUBLE);
+        distance_y = distance_y - 1;
+        if (Serial.available()) {
+            break_var = 1;
+            Serial.print(String("Stop pressed!"));
+            }
+        }
+  }
+  else {
+    while (distance_y > 0 && break_var == 0) {
+        myMotor1->step(1, FORWARD, DOUBLE);
+        distance_y = distance_y - 1;
+        if (Serial.available()) {
+            break_var = 1;
+            Serial.print(String("Stop pressed!"));
+            }
+        }
+  }
+  xposition = 0;
+  yposition = 0;
+  Serial.print(String("<") + xposition + String(";") + yposition + String(";Moved to x: ") + xposition + String(" y: ") + yposition);
+  Serial.println(String(" Current speed y: ") + speed1 + String(" x: ") + speed2 + String(">"));
 }
 
 // Manual Mode: Control xy movement by realtime input
@@ -291,7 +378,7 @@ void ManualMode(){
     input = Serial.read();
    }
    }
-   
+
    while (input == 'f') {
    if (Serial.available() > 0) {  //Keine Bewegung
     input = Serial.read();
@@ -302,4 +389,4 @@ void ManualMode(){
     eg = 0;
    }
    }
- }   
+ }
